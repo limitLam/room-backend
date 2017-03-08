@@ -2,12 +2,18 @@ import fs from 'fs';
 
 import express from 'express';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import expressSession from 'express-session';
 
 //	mongoose
 const DB_URL = 'mongodb://localhost/room';
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
 mongoose.connect(DB_URL);
+
+//	mongoStore
+import connectMongo from 'connect-mongo';
+let mongoStore = connectMongo(expressSession);
 
 //	工具类(中间层)
 import {
@@ -31,12 +37,21 @@ app.use(bodyParser.urlencoded({
 	extended: true
 })); // for parsing application/x-www-form-urlencoded
 
-import {
-	signin
-} from './app/router';
+//	会话持久化
+app.use(cookieParser());
+app.use(expressSession({
+	secret: 'room',
+	resave: false,
+	saveUninitialized: false,
+	store: new mongoStore({
+		url: DB_URL,
+		collections: 'sessions'
+	})
+}))
 
-// 登录模块
-app.use('/signin', signin);
+//	路由
+import router from './app/router';
+router(app);
 
 app.listen(PORT, () => {
 	console.log(`server running http://localhost:${PORT}`);

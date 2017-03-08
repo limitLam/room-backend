@@ -15,7 +15,7 @@ export const signin = (req, res) => {
 
 		if (!user) {
 			return res.json({
-				code: 500,
+				code: -1,
 				data: {},
 				msg: '没有该注册用户'
 			});
@@ -27,22 +27,30 @@ export const signin = (req, res) => {
 			}
 
 			if (isMatch) {
-				// req.session.user = user
+				req.session.user = user
 
 				return res.json({
-					code: 200,
-					data: {
-						_id: user._id
-					},
+					code: 0,
+					data: {},
 					msg: ''
 				});
 			} else {
 				return res.json({
-					code: 500,
+					code: -2,
 					data: {},
 					msg: '密码错误'
 				});
 			}
 		})
 	})
+}
+
+export const logout = (req, res) => {
+	delete req.session.user;
+
+	res.json({
+		code: 0,
+		data: {},
+		msg: ''
+	});
 }
