@@ -54,3 +54,17 @@ export const logout = (req, res) => {
 		msg: ''
 	});
 }
+
+export const signinRequired = (req, res, next) => {
+	var user = req.session.user;
+
+	if (!user) {
+		return res.json({
+			code: -3,
+			data: {},
+			msg: '没有登录'
+		});
+	}
+
+	next()
+}

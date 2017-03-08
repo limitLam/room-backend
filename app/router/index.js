@@ -1,12 +1,17 @@
 import User from './user';
+import Room from './Room';
 
 export {
 	User,
+	Room,
 }
 
 const router = (app) => {
 	//	账户模块
 	app.use('/api/user', User);
+
+	//	会议厅模块
+	app.use('/api/room', Room);
 
 	//	测试模块
 	app.get('/', (req, res) => {
