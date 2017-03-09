@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-let RoomSchema = new mongoose.Schema({
+let BelongSchema = new mongoose.Schema({
 	name: {
 		unique: true,
 		type: String
@@ -9,7 +9,6 @@ let RoomSchema = new mongoose.Schema({
 		unique: true,
 		type: String
 	},
-	belong: String,
 	createAt: {
 		type: Date,
 		default: Date.now()
@@ -20,26 +19,26 @@ let RoomSchema = new mongoose.Schema({
 	}
 });
 
-RoomSchema.pre('save', function(next) {
+BelongSchema.pre('save', function(next) {
 
 	this.createAt = this.updateAt = Date.now();
 
 	next();
 });
 
-RoomSchema.pre('update', function(next) {
-
-	this.updateAt = Date.now();
-
-	next();
-});
-
-RoomSchema.static('findByCode', function(code, cb) {
+BelongSchema.static('findByCode', function(code, cb) {
 	return this
 		.findOne({
 			code: code
 		})
-		.exec(cb);
+		.exec(cb)
 });
 
-export default RoomSchema;
+BelongSchema.static('fetch', function(cb) {
+	return this
+		.find({})
+		.sort('updateAt')
+		.exec(cb)
+});
+
+export default BelongSchema;

@@ -1,10 +1,24 @@
 import mongoose from 'mongoose';
 let User = mongoose.model('User');
 
+//	返回码
+import {
+	returnCode
+} from '../../utils';
+
 export const signin = (req, res) => {
 	let _user = req.body;
 	let name = _user.name;
 	let password = _user.password;
+
+	// let user = new User(_user)
+	// user.save(function(err, user) {
+	// 	if (err) {
+	// 		console.log(err)
+	// 	}
+
+	// 	return res.json(returnCode('SUCCESS'));
+	// })
 
 	User.findOne({
 		name: name
@@ -14,11 +28,7 @@ export const signin = (req, res) => {
 		}
 
 		if (!user) {
-			return res.json({
-				code: -1,
-				data: {},
-				msg: '没有该注册用户'
-			});
+			return res.json(returnCode('NO_USER'));
 		}
 
 		user.comparePassword(password, (err, isMatch) => {
@@ -29,17 +39,9 @@ export const signin = (req, res) => {
 			if (isMatch) {
 				req.session.user = user
 
-				return res.json({
-					code: 0,
-					data: {},
-					msg: ''
-				});
+				return res.json(returnCode('SUCCESS'));
 			} else {
-				return res.json({
-					code: -2,
-					data: {},
-					msg: '密码错误'
-				});
+				return res.json(returnCode('PASSWORD_ERROR'));
 			}
 		})
 	})
@@ -48,22 +50,14 @@ export const signin = (req, res) => {
 export const logout = (req, res) => {
 	delete req.session.user;
 
-	res.json({
-		code: 0,
-		data: {},
-		msg: ''
-	});
+	res.json(returnCode('SUCCESS', null, '退出成功'));
 }
 
 export const signinRequired = (req, res, next) => {
-	var user = req.session.user;
+	let user = req.session.user;
 
 	if (!user) {
-		return res.json({
-			code: -3,
-			data: {},
-			msg: '没有登录'
-		});
+		return res.json(returnCode('NOT_LOGGED_IN'));
 	}
 
 	next()
